@@ -2,6 +2,8 @@ from cmath import nan
 import numpy  as np
 import matplotlib.pyplot as plt
 from math import sqrt
+import pandas as pd
+import argparse
 
 def mean(mylist: list):
 
@@ -29,6 +31,8 @@ class LinearRegression:
 
 	
 	def fit(self, x, y):
+		if len(x) == 0 or len(y) == 0:
+			raise ValueError("Empty data provided for training")
 		n_samples = len(x)
 		self.weight = 0
 		self.bias = 0
@@ -56,9 +60,6 @@ class LinearRegression:
 		with open(file_path, 'w') as f:
 			f.write(f"{self.weight},{self.bias}")
 
-	def estimate_price(self ,mileage):
-		return  self.weight * mileage + self.bias
-
 	def load_parameters(self, file_path='parameters.txt'):
 		try:
 			with open(file_path, 'r') as f:
@@ -70,7 +71,7 @@ class LinearRegression:
 			self.bias = 0
 
 	@staticmethod
-	def R2(y, y_pred):
+	def r2_score(y, y_pred):
 		y_mean = mean(y)
 		ss_res = sum((y - y_pred)**2)
 		ss_tot = sum((y - y_mean)**2)
@@ -78,12 +79,30 @@ class LinearRegression:
 
 	def plot(self, x, y):
 		y_pred = self.predict(x)
-		r2_score = LinearRegression.R2(y, y_pred)
+		r2_score = LinearRegression.r2_score(y, y_pred)
 		plt.figure(figsize=(8, 6))
 		plt.scatter(x, y, color='blue', label='Training Data')
 		plt.plot(x, y_pred, color='red', linewidth=1, label='Predictions')
-		plt.title(f'Linear Regression {r2_score * 100 :.2f}%')
+		plt.title(f'Linear Regression precision: {r2_score * 100 :.2f}%')
 		plt.xlabel('Kilometers')
 		plt.ylabel('Price')
 		plt.legend()
 		plt.show()
+
+def main():
+    parser = argparse.ArgumentParser(description='Linear Regression Training')
+    parser.add_argument('-v', '--visualize', action='store_true', help='Plot the results')
+    args = parser.parse_args()
+    df = pd.read_csv('./data.csv')
+    X = df['km']. values
+    Y = df['price']. values
+
+    lreg = LinearRegression()
+    lreg.fit(X, Y)
+    lreg.save_parameters()
+    if args.visualize:
+        lreg.plot(X, Y)
+
+
+if __name__ == '__main__':
+    main()

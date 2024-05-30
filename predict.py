@@ -9,7 +9,7 @@ def main():
     except ValueError: 
         print('Please enter a valid number')
         return
-    print(f'Estimated price for a car with mileage of {mileage} km is: {lreg.estimate_price(mileage)}')
+    print(f'Estimated price for a car with mileage of {mileage} km is: {lreg.predict(mileage)}')
 
 if __name__ == '__main__':
     main()
